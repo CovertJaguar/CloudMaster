@@ -1,10 +1,7 @@
 package mods.cloudmaster;
 
 import cpw.mods.fml.common.Mod;
-import cpw.mods.fml.common.Mod.Init;
 import cpw.mods.fml.common.Mod.Instance;
-import cpw.mods.fml.common.Mod.PostInit;
-import cpw.mods.fml.common.Mod.PreInit;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
@@ -14,8 +11,8 @@ import net.minecraftforge.common.Configuration;
 
 @Mod(modid = CloudMaster.MOD_ID, name = CloudMaster.MOD_ID,
      version = CloudMaster.VERSION,
-     acceptedMinecraftVersions = "[1.5,1.6)",
-     dependencies = "required-after:Forge@[7.7.1.624,);")
+     acceptedMinecraftVersions = "[1.6,1.7)",
+     dependencies = "required-after:Forge@[9.10.0.800,);")
 public final class CloudMaster {
 
     public static final String MOD_ID = "CloudMaster";
@@ -42,7 +39,7 @@ public final class CloudMaster {
         return VERSION;
     }
 
-    @PreInit
+    @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
         Configuration config = new Configuration(new File(event.getModConfigurationDirectory(), "cloudmaster.cfg"));
         config.load();
@@ -54,11 +51,11 @@ public final class CloudMaster {
         }
     }
 
-    @Init
+    @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
     }
 
-    @PostInit
+    @Mod.EventHandler
     public void postInit(FMLPostInitializationEvent event) {
 
         proxy.initClient();

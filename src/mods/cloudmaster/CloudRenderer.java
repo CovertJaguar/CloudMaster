@@ -15,6 +15,7 @@ import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.MathHelper;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.client.IRenderHandler;
 import org.lwjgl.opengl.GL11;
@@ -26,6 +27,7 @@ import org.lwjgl.opengl.GL11;
 @SideOnly(Side.CLIENT)
 public class CloudRenderer extends IRenderHandler {
 
+    private static final ResourceLocation CLOUD_TEXTURE = new ResourceLocation("textures/environment/clouds.png");
     public static final CloudRenderer INSTANCE = new CloudRenderer();
 
     private float getCloudHeight() {
@@ -48,7 +50,7 @@ public class CloudRenderer extends IRenderHandler {
                 byte b0 = 32;
                 int i = 256 / b0;
                 Tessellator tessellator = Tessellator.instance;
-                mc.renderEngine.bindTexture("/environment/clouds.png");
+                mc.renderEngine.func_110577_a(CLOUD_TEXTURE);
                 GL11.glEnable(GL11.GL_BLEND);
                 GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
                 Vec3 vec3 = world.getCloudColour(partialTicks);
@@ -114,7 +116,7 @@ public class CloudRenderer extends IRenderHandler {
         int j = MathHelper.floor_double(d2 / 2048.0D);
         d1 -= (double) (i * 2048);
         d2 -= (double) (j * 2048);
-        mc.renderEngine.bindTexture("/environment/clouds.png");
+        mc.renderEngine.func_110577_a(CLOUD_TEXTURE);
         GL11.glEnable(GL11.GL_BLEND);
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         Vec3 vec3 = world.getCloudColour(par1);
