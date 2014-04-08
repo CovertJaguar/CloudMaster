@@ -1,0 +1,182 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven {
+            name = "forge"
+            url = "http://files.minecraftforge.net/maven"
+        }
+        maven {
+            name = "sonatype"
+            url = "https://oss.sonatype.org/content/repositories/snapshots/"
+        }
+    }
+    dependencies {
+        classpath 'net.minecraftforge.gradle:ForgeGradle:1.1-SNAPSHOT'
+    }
+}
+
+apply plugin: 'forge'
+
+version = version_major + '.' + version_build
+group= "com.headlamp-games.cloudmaster" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+archivesBaseName = "CloadMaster_" + mcversion
+
+minecraft {
+    version = mcversion + "-" + forgeversion
+    assetDir = "eclipse/assets"
+    
+    replace '@VERSION@', project.version
+}
+
+processResources
+{
+    // replace stuff in mcmod.info, nothing else
+    from(sourceSets.main.resources.srcDirs) {
+        include 'mcmod.info'
+                
+        // replace version and mcversion
+        expand 'version':project.version, 'mcversion':project.minecraft.version
+    }
+        
+    // copy everything else, thats not the mcmod.info
+    from(sourceSets.main.resources.srcDirs) {
+        exclude 'mcmod.info'
+    }
+}
+
+task echoVersion << {
+    printNextVersion()
+}
+
+def saveVersion() {
+    ant.propertyfile(
+        file: "gradle.properties") {
+        entry( key:"version_major", type:"int", value: version_major)
+        entry( key:"version_build", type:"int", value: version_build)
+    }
+    project.version = version_major + '.' + version_build
+    printNextVersion()
+}
+
+def printNextVersion(){
+    println '*************************************************************'
+    println 'The next build will be version: ' +  project.version
+    println '*************************************************************'
+}
+
+task bumpMajor << {
+    project.version_major = Integer.parseInt(project.version_major) + 1
+    project.version_build = "0"
+    saveVersion()
+}
+
+task bumpBuild << {
+    project.version_build = Integer.parseInt(project.version_build) + 1
+    saveVersion()
+}
+
+task setBuild << {
+    def console = System.console()
+    if (console) {
+        project.version_build = console.readLine('> What should the build be? ')
+    } else {
+        logger.error "Cannot get console."
+    }
+    saveVersion()
+}
+
+jar {
+    destinationDir = file("build/tmp")
+    archiveName = "main.jar"
+}
+
+task mainJarSigned(type: Jar, dependsOn: 'reobf') {
+    from (zipTree(jar.getArchivePath())) {
+        exclude '**/api/**'
+    }
+ 
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    destinationDir = file("build/tmp")
+    archiveName = "signed.jar"
+       
+    doLast {
+        if (project.hasProperty('signingKeystore')) {
+            ant.signjar(jar: getArchivePath(),
+                alias: signingAlias,
+                keystore: signingKeystore,
+                storepass: signingStorepass)
+        } else {
+            println 'Signing disabled, gradle.properties is missing.'
+        }
+    }
+}
+ 
+task mainJar(type: Zip, dependsOn: mainJarSigned) {
+    from (zipTree(mainJarSigned.getArchivePath())) {
+        include '**'
+    }
+       
+    from (zipTree(jar.getArchivePath())) {
+        include '**'
+    }
+       
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    destinationDir = project.libsDir
+    includeEmptyDirs = false
+    extension = 'jar'
+}
+
+task devJarSigned(type: Jar, dependsOn: 'classes') {       
+    from(sourceSets.main.output) {
+        exclude '**/api/**'
+    }
+       
+    destinationDir = file("build/tmp")
+    archiveName = "signed-dev.jar"
+       
+    doLast {
+        if (project.hasProperty('signingKeystore')) {
+            ant.signjar(jar: getArchivePath(),
+                alias: signingAlias,
+                keystore: signingKeystore,
+                storepass: signingStorepass)
+        } else {
+            println 'Signing disabled, gradle.properties is missing.'
+        }
+    }
+}
+
+task devJar(type: Zip, dependsOn: devJarSigned) {
+    from (zipTree(devJarSigned.getArchivePath())) {
+        include '**'
+    }
+       
+    from(sourceSets.main.allSource) {
+        include '**/api/**'
+    }
+ 
+    from(sourceSets.main.output) {
+        include '**'
+    }
+  
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    destinationDir = project.libsDir
+    extension = 'jar'
+       
+    classifier = 'dev'
+}
+
+task releaseInit << {    
+    println '*************************************************************'
+    println 'This build will be version: ' +  project.version
+    println '*************************************************************'
+}
+
+task release << {
+    project.version_build = Integer.parseInt(project.version_build) + 1
+    saveVersion()
+}
+
+release.dependsOn releaseInit, mainJar, devJar
+mainJar.shouldRunAfter releaseInit
+devJar.shouldRunAfter releaseInit
