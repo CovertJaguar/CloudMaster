@@ -1,7 +1,7 @@
 package mods.cloudmaster;
 
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.ForgeSubscribe;
 import net.minecraftforge.event.world.WorldEvent;
 
 public class ClientProxy extends CommonProxy {
@@ -11,7 +11,7 @@ public class ClientProxy extends CommonProxy {
         MinecraftForge.EVENT_BUS.register(this);
     }
 
-    @ForgeSubscribe
+    @SubscribeEvent
     public void worldChange(WorldEvent.Load event) {
         if (event.world.provider.dimensionId == 0) {
             event.world.provider.setCloudRenderer(CloudRenderer.INSTANCE);

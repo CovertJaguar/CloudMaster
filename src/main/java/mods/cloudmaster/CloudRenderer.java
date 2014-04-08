@@ -50,7 +50,7 @@ public class CloudRenderer extends IRenderHandler {
                 byte b0 = 32;
                 int i = 256 / b0;
                 Tessellator tessellator = Tessellator.instance;
-                mc.renderEngine.func_110577_a(CLOUD_TEXTURE);
+                mc.renderEngine.bindTexture(CLOUD_TEXTURE);
                 GL11.glEnable(GL11.GL_BLEND);
                 GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
                 Vec3 vec3 = world.getCloudColour(partialTicks);
@@ -116,7 +116,7 @@ public class CloudRenderer extends IRenderHandler {
         int j = MathHelper.floor_double(d2 / 2048.0D);
         d1 -= (double) (i * 2048);
         d2 -= (double) (j * 2048);
-        mc.renderEngine.func_110577_a(CLOUD_TEXTURE);
+        mc.renderEngine.bindTexture(CLOUD_TEXTURE);
         GL11.glEnable(GL11.GL_BLEND);
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         Vec3 vec3 = world.getCloudColour(par1);

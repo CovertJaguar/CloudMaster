@@ -6,15 +6,13 @@ import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import cpw.mods.fml.common.network.NetworkMod;
 import java.io.File;
-import net.minecraftforge.common.Configuration;
+import net.minecraftforge.common.config.Configuration;
 
 @Mod(modid = CloudMaster.MOD_ID, name = CloudMaster.MOD_ID,
      version = CloudMaster.VERSION,
-     acceptedMinecraftVersions = "[1.6,1.7)",
-     dependencies = "required-after:Forge@[9.10.0.800,);")
-@NetworkMod(serverSideRequired = false)
+     acceptedMinecraftVersions = "[1.7,1.8)",
+     dependencies = "required-after:Forge@[10.12.0.1047,);")
 public final class CloudMaster {
 
     public static final String MOD_ID = "CloudMaster";
