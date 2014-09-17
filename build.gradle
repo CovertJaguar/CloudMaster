@@ -23,7 +23,7 @@ archivesBaseName = "CloadMaster_" + mcversion
 
 minecraft {
     version = mcversion + "-" + forgeversion
-    runDir = "eclipse"
+    runDir = "run"
     
     replace '@VERSION@', project.version
 }
