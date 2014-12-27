@@ -1,14 +1,14 @@
 [
 {
-  "modid": "examplemod",
-  "name": "Example Mod",
-  "description": "Example placeholder mod.",
-  "version": "${version}",
+  "modid": "CloudMaster",
+  "name": "CloudMaster",
+  "description": "A simple mod enabling you to adjust the cloud height via a config file",
+  "version": "1.0",
   "mcversion": "${mcversion}",
   "url": "",
   "updateUrl": "",
-  "authors": ["ExampleDude"],
-  "credits": "The Forge and FML guys, for making this example",
+  "authors": ["CovertJaguar"],
+  "credits": "CovertJaguar",
   "logoFile": "",
   "screenshots": [],
   "dependencies": []
