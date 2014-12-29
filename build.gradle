@@ -19,7 +19,7 @@ apply plugin: 'forge'
 
 version = version_major + '.' + version_build
 group= "com.headlamp-games.cloudmaster" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "CloadMaster_" + mcversion
+archivesBaseName = "CloudMaster_" + mcversion
 
 minecraft {
     version = mcversion + "-" + forgeversion

@@ -1,15 +1,16 @@
 [
 {
-  "modid": "examplemod",
-  "name": "Example Mod",
-  "description": "Example placeholder mod.",
+  "modid": "CloudMaster",
+  "name": "CloudMaster",
+  "description": "Allows Cloud Height Modification",
   "version": "${version}",
   "mcversion": "${mcversion}",
-  "url": "",
+  "logoFile": "assets/cloudmaster/logo.png",
+  "url": "http://railcraft.info/cloudmaster",
   "updateUrl": "",
-  "authors": ["ExampleDude"],
-  "credits": "The Forge and FML guys, for making this example",
-  "logoFile": "",
+  "authors": ["CovertJaguar"],
+  "credits": "Created by CovertJaguar",
+  "parent": "",
   "screenshots": [],
   "dependencies": []
 }
