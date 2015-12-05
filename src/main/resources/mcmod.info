@@ -1,17 +1,21 @@
-[
 {
-  "modid": "CloudMaster",
-  "name": "CloudMaster",
-  "description": "Allows Cloud Height Modification",
-  "version": "${version}",
-  "mcversion": "${mcversion}",
-  "logoFile": "assets/cloudmaster/logo.png",
-  "url": "http://railcraft.info/cloudmaster",
-  "updateUrl": "",
-  "authors": ["CovertJaguar"],
-  "credits": "Created by CovertJaguar",
-  "parent": "",
-  "screenshots": [],
-  "dependencies": []
+  "modListVersion": 2,
+  "modList": [{
+    "modid": "CloudMaster",
+    "name": "CloudMaster",
+    "description": "Allows Cloud Height Modification",
+    "version": "${version}",
+    "mcversion": "${mcversion}",
+    "url": "http://railcraft.info/cloudmaster",
+    "updateUrl": "http://railcraft.info/cloudmaster",
+    "authorList": [ "CovertJaguar" ],
+    "credits": "Created by CovertJaguar",
+    "logoFile": "assets/cloudmaster/logo.png",
+    "screenshots": [],
+    "parent": "",
+    "requiredMods": [ "Forge" ],
+    "dependencies": [],
+    "dependants": [],
+    "useDependencyInformation": true
+  }]
 }
-]
