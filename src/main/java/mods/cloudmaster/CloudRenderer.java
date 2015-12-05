@@ -8,17 +8,20 @@
  */
 package mods.cloudmaster;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.renderer.EntityRenderer;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Vec3;
+
 import net.minecraftforge.client.IRenderHandler;
-import org.lwjgl.opengl.GL11;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
  *
@@ -41,209 +44,219 @@ public class CloudRenderer extends IRenderHandler {
 
     @Override
     public void render(float partialTicks, WorldClient world, Minecraft mc) {
-        if (mc.theWorld.provider.isSurfaceWorld()) {
-            if (mc.gameSettings.fancyGraphics) {
-                renderCloudsFancy(partialTicks, world, mc);
-            } else {
-                GL11.glDisable(GL11.GL_CULL_FACE);
-                float f1 = (float) (mc.renderViewEntity.lastTickPosY + (mc.renderViewEntity.posY - mc.renderViewEntity.lastTickPosY) * (double) partialTicks);
-                byte b0 = 32;
-                int i = 256 / b0;
-                Tessellator tessellator = Tessellator.instance;
-                mc.renderEngine.bindTexture(CLOUD_TEXTURE);
-                GL11.glEnable(GL11.GL_BLEND);
-                GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-                Vec3 vec3 = world.getCloudColour(partialTicks);
-                float f2 = (float) vec3.xCoord;
-                float f3 = (float) vec3.yCoord;
-                float f4 = (float) vec3.zCoord;
-                float f5;
+		if (world.provider.isSurfaceWorld())
+		{
+			if (mc.gameSettings.func_181147_e() == 2)
+			{
+				this.renderCloudsFancy(partialTicks, world, mc);
+			}
+			else
+			{
+				GlStateManager.disableCull();
+				float f = (float)(mc.getRenderViewEntity().lastTickPosY + (mc.getRenderViewEntity().posY - mc.getRenderViewEntity().lastTickPosY) * (double)partialTicks);
+				int i = 32;
+				int j = 8;
+				Tessellator tessellator = Tessellator.getInstance();
+				WorldRenderer worldrenderer = tessellator.getWorldRenderer();
+				mc.renderEngine.bindTexture(CLOUD_TEXTURE);
+				GlStateManager.enableBlend();
+				GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
+				Vec3 vec3 = world.getCloudColour(partialTicks);
+				float f1 = (float)vec3.xCoord;
+				float f2 = (float)vec3.yCoord;
+				float f3 = (float)vec3.zCoord;
 
-                if (mc.gameSettings.anaglyph) {
-                    f5 = (f2 * 30.0F + f3 * 59.0F + f4 * 11.0F) / 100.0F;
-                    float f6 = (f2 * 30.0F + f3 * 70.0F) / 100.0F;
-                    float f7 = (f2 * 30.0F + f4 * 70.0F) / 100.0F;
-                    f2 = f5;
-                    f3 = f6;
-                    f4 = f7;
-                }
+				if (mc.gameSettings.anaglyph)
+				{
+					float f4 = (f1 * 30.0F + f2 * 59.0F + f3 * 11.0F) / 100.0F;
+					float f5 = (f1 * 30.0F + f2 * 70.0F) / 100.0F;
+					float f6 = (f1 * 30.0F + f3 * 70.0F) / 100.0F;
+					f1 = f4;
+					f2 = f5;
+					f3 = f6;
+				}
 
-                f5 = 4.8828125E-4F;
-                double d0 = (double) ((float) cloudTickCounter + partialTicks);
-                double d1 = mc.renderViewEntity.prevPosX + (mc.renderViewEntity.posX - mc.renderViewEntity.prevPosX) * (double) partialTicks + d0 * 0.029999999329447746D;
-                double d2 = mc.renderViewEntity.prevPosZ + (mc.renderViewEntity.posZ - mc.renderViewEntity.prevPosZ) * (double) partialTicks;
-                int j = MathHelper.floor_double(d1 / 2048.0D);
-                int k = MathHelper.floor_double(d2 / 2048.0D);
-                d1 -= (double) (j * 2048);
-                d2 -= (double) (k * 2048);
-                float f8 = getCloudHeight() - f1 + 0.33F;
-                float f9 = (float) (d1 * (double) f5);
-                float f10 = (float) (d2 * (double) f5);
-                tessellator.startDrawingQuads();
-                tessellator.setColorRGBA_F(f2, f3, f4, 0.8F);
+				float f10 = 4.8828125E-4F;
+				double d2 = (double)((float)this.cloudTickCounter + partialTicks);
+				double d0 = mc.getRenderViewEntity().prevPosX + (mc.getRenderViewEntity().posX - mc.getRenderViewEntity().prevPosX) * (double)partialTicks + d2 * 0.029999999329447746D;
+				double d1 = mc.getRenderViewEntity().prevPosZ + (mc.getRenderViewEntity().posZ - mc.getRenderViewEntity().prevPosZ) * (double)partialTicks;
+				int k = MathHelper.floor_double(d0 / 2048.0D);
+				int l = MathHelper.floor_double(d1 / 2048.0D);
+				d0 = d0 - (double)(k * 2048);
+				d1 = d1 - (double)(l * 2048);
+				float f7 = getCloudHeight() - f + 0.33F;
+				float f8 = (float)(d0 * 4.8828125E-4D);
+				float f9 = (float)(d1 * 4.8828125E-4D);
+				worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
 
-                for (int l = -b0 * i; l < b0 * i; l += b0) {
-                    for (int i1 = -b0 * i; i1 < b0 * i; i1 += b0) {
-                        tessellator.addVertexWithUV((double) (l + 0), (double) f8, (double) (i1 + b0), (double) ((float) (l + 0) * f5 + f9), (double) ((float) (i1 + b0) * f5 + f10));
-                        tessellator.addVertexWithUV((double) (l + b0), (double) f8, (double) (i1 + b0), (double) ((float) (l + b0) * f5 + f9), (double) ((float) (i1 + b0) * f5 + f10));
-                        tessellator.addVertexWithUV((double) (l + b0), (double) f8, (double) (i1 + 0), (double) ((float) (l + b0) * f5 + f9), (double) ((float) (i1 + 0) * f5 + f10));
-                        tessellator.addVertexWithUV((double) (l + 0), (double) f8, (double) (i1 + 0), (double) ((float) (l + 0) * f5 + f9), (double) ((float) (i1 + 0) * f5 + f10));
-                    }
-                }
+				for (int i1 = -256; i1 < 256; i1 += 32)
+				{
+					for (int j1 = -256; j1 < 256; j1 += 32)
+					{
+						worldrenderer.pos((double)(i1 + 0), (double)f7, (double)(j1 + 32)).tex((double)((float)(i1 + 0) * 4.8828125E-4F + f8), (double)((float)(j1 + 32) * 4.8828125E-4F + f9)).color(f1, f2, f3, 0.8F).endVertex();
+						worldrenderer.pos((double)(i1 + 32), (double)f7, (double)(j1 + 32)).tex((double)((float)(i1 + 32) * 4.8828125E-4F + f8), (double)((float)(j1 + 32) * 4.8828125E-4F + f9)).color(f1, f2, f3, 0.8F).endVertex();
+						worldrenderer.pos((double)(i1 + 32), (double)f7, (double)(j1 + 0)).tex((double)((float)(i1 + 32) * 4.8828125E-4F + f8), (double)((float)(j1 + 0) * 4.8828125E-4F + f9)).color(f1, f2, f3, 0.8F).endVertex();
+						worldrenderer.pos((double)(i1 + 0), (double)f7, (double)(j1 + 0)).tex((double)((float)(i1 + 0) * 4.8828125E-4F + f8), (double)((float)(j1 + 0) * 4.8828125E-4F + f9)).color(f1, f2, f3, 0.8F).endVertex();
+					}
+				}
 
-                tessellator.draw();
-                GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-                GL11.glDisable(GL11.GL_BLEND);
-                GL11.glEnable(GL11.GL_CULL_FACE);
-            }
-        }
+				tessellator.draw();
+				GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+				GlStateManager.disableBlend();
+				GlStateManager.enableCull();
+			}
+		}
     }
 
     /**
      * Renders the 3d fancy clouds
      */
-    public void renderCloudsFancy(float par1, WorldClient world, Minecraft mc) {
-        GL11.glDisable(GL11.GL_CULL_FACE);
-        float f1 = (float) (mc.renderViewEntity.lastTickPosY + (mc.renderViewEntity.posY - mc.renderViewEntity.lastTickPosY) * (double) par1);
-        Tessellator tessellator = Tessellator.instance;
-        float f2 = 12.0F;
-        float f3 = 4.0F;
-        double d0 = (double) ((float) cloudTickCounter + par1);
-        double d1 = (mc.renderViewEntity.prevPosX + (mc.renderViewEntity.posX - mc.renderViewEntity.prevPosX) * (double) par1 + d0 * 0.029999999329447746D) / (double) f2;
-        double d2 = (mc.renderViewEntity.prevPosZ + (mc.renderViewEntity.posZ - mc.renderViewEntity.prevPosZ) * (double) par1) / (double) f2 + 0.33000001311302185D;
-        float f4 = getCloudHeight() - f1 + 0.33F;
-        int i = MathHelper.floor_double(d1 / 2048.0D);
-        int j = MathHelper.floor_double(d2 / 2048.0D);
-        d1 -= (double) (i * 2048);
-        d2 -= (double) (j * 2048);
-        mc.renderEngine.bindTexture(CLOUD_TEXTURE);
-        GL11.glEnable(GL11.GL_BLEND);
-        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-        Vec3 vec3 = world.getCloudColour(par1);
-        float f5 = (float) vec3.xCoord;
-        float f6 = (float) vec3.yCoord;
-        float f7 = (float) vec3.zCoord;
-        float f8;
-        float f9;
-        float f10;
+    public void renderCloudsFancy(float partialTicks, WorldClient world, Minecraft mc) {
+		GlStateManager.disableCull();
+		float f = (float)(mc.getRenderViewEntity().lastTickPosY + (mc.getRenderViewEntity().posY - mc.getRenderViewEntity().lastTickPosY) * (double)partialTicks);
+		Tessellator tessellator = Tessellator.getInstance();
+		WorldRenderer worldrenderer = tessellator.getWorldRenderer();
+		float f1 = 12.0F;
+		float f2 = 4.0F;
+		double d0 = (double)((float)this.cloudTickCounter + partialTicks);
+		double d1 = (mc.getRenderViewEntity().prevPosX + (mc.getRenderViewEntity().posX - mc.getRenderViewEntity().prevPosX) * (double)partialTicks + d0 * 0.029999999329447746D) / 12.0D;
+		double d2 = (mc.getRenderViewEntity().prevPosZ + (mc.getRenderViewEntity().posZ - mc.getRenderViewEntity().prevPosZ) * (double)partialTicks) / 12.0D + 0.33000001311302185D;
+		float f3 = getCloudHeight() - f + 0.33F;
+		int i = MathHelper.floor_double(d1 / 2048.0D);
+		int j = MathHelper.floor_double(d2 / 2048.0D);
+		d1 = d1 - (double)(i * 2048);
+		d2 = d2 - (double)(j * 2048);
+		mc.renderEngine.bindTexture(CLOUD_TEXTURE);
+		GlStateManager.enableBlend();
+		GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
+		Vec3 vec3 = world.getCloudColour(partialTicks);
+		float f4 = (float)vec3.xCoord;
+		float f5 = (float)vec3.yCoord;
+		float f6 = (float)vec3.zCoord;
 
-        if (mc.gameSettings.anaglyph) {
-            f8 = (f5 * 30.0F + f6 * 59.0F + f7 * 11.0F) / 100.0F;
-            f10 = (f5 * 30.0F + f6 * 70.0F) / 100.0F;
-            f9 = (f5 * 30.0F + f7 * 70.0F) / 100.0F;
-            f5 = f8;
-            f6 = f10;
-            f7 = f9;
-        }
+		if (mc.gameSettings.anaglyph)
+		{
+			float f7 = (f4 * 30.0F + f5 * 59.0F + f6 * 11.0F) / 100.0F;
+			float f8 = (f4 * 30.0F + f5 * 70.0F) / 100.0F;
+			float f9 = (f4 * 30.0F + f6 * 70.0F) / 100.0F;
+			f4 = f7;
+			f5 = f8;
+			f6 = f9;
+		}
 
-        f8 = (float) (d1 * 0.0D);
-        f10 = (float) (d2 * 0.0D);
-        f9 = 0.00390625F;
-        f8 = (float) MathHelper.floor_double(d1) * f9;
-        f10 = (float) MathHelper.floor_double(d2) * f9;
-        float f11 = (float) (d1 - (double) MathHelper.floor_double(d1));
-        float f12 = (float) (d2 - (double) MathHelper.floor_double(d2));
-        byte b0 = 8;
-        byte b1 = 4;
-        float f13 = 9.765625E-4F;
-        GL11.glScalef(f2, 1.0F, f2);
+		float f26 = f4 * 0.9F;
+		float f27 = f5 * 0.9F;
+		float f28 = f6 * 0.9F;
+		float f10 = f4 * 0.7F;
+		float f11 = f5 * 0.7F;
+		float f12 = f6 * 0.7F;
+		float f13 = f4 * 0.8F;
+		float f14 = f5 * 0.8F;
+		float f15 = f6 * 0.8F;
+		float f16 = 0.00390625F;
+		float f17 = (float)MathHelper.floor_double(d1) * 0.00390625F;
+		float f18 = (float)MathHelper.floor_double(d2) * 0.00390625F;
+		float f19 = (float)(d1 - (double)MathHelper.floor_double(d1));
+		float f20 = (float)(d2 - (double)MathHelper.floor_double(d2));
+		int k = 8;
+		int l = 4;
+		float f21 = 9.765625E-4F;
+		GlStateManager.scale(12.0F, 1.0F, 12.0F);
 
-        for (int k = 0; k < 2; ++k) {
-            if (k == 0) {
-                GL11.glColorMask(false, false, false, false);
-            } else if (mc.gameSettings.anaglyph) {
-                if (EntityRenderer.anaglyphField == 0) {
-                    GL11.glColorMask(false, true, true, true);
-                } else {
-                    GL11.glColorMask(true, false, false, true);
-                }
-            } else {
-                GL11.glColorMask(true, true, true, true);
-            }
+		for (int i1 = 0; i1 < 2; ++i1)
+		{
+			if (i1 == 0)
+			{
+				GlStateManager.colorMask(false, false, false, false);
+			}
+			else if (mc.gameSettings.anaglyph) {
+				if (EntityRenderer.anaglyphField == 0) {
+					GlStateManager.colorMask(false, true, true, true);
+				} else {
+					GlStateManager.colorMask(true, false, false, true);
+				}
+			} else {
+				GlStateManager.colorMask(true, true, true, true);
+			}
 
-            for (int l = -b1 + 1; l <= b1; ++l) {
-                for (int i1 = -b1 + 1; i1 <= b1; ++i1) {
-                    tessellator.startDrawingQuads();
-                    float f14 = (float) (l * b0);
-                    float f15 = (float) (i1 * b0);
-                    float f16 = f14 - f11;
-                    float f17 = f15 - f12;
+			for (int j1 = -3; j1 <= 4; ++j1)
+			{
+				for (int k1 = -3; k1 <= 4; ++k1)
+				{
+					worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR_NORMAL);
+					float f22 = (float)(j1 * 8);
+					float f23 = (float)(k1 * 8);
+					float f24 = f22 - f19;
+					float f25 = f23 - f20;
 
-                    if (f4 > -f3 - 1.0F) {
-                        tessellator.setColorRGBA_F(f5 * 0.7F, f6 * 0.7F, f7 * 0.7F, 0.8F);
-                        tessellator.setNormal(0.0F, -1.0F, 0.0F);
-                        tessellator.addVertexWithUV((double) (f16 + 0.0F), (double) (f4 + 0.0F), (double) (f17 + (float) b0), (double) ((f14 + 0.0F) * f9 + f8), (double) ((f15 + (float) b0) * f9 + f10));
-                        tessellator.addVertexWithUV((double) (f16 + (float) b0), (double) (f4 + 0.0F), (double) (f17 + (float) b0), (double) ((f14 + (float) b0) * f9 + f8), (double) ((f15 + (float) b0) * f9 + f10));
-                        tessellator.addVertexWithUV((double) (f16 + (float) b0), (double) (f4 + 0.0F), (double) (f17 + 0.0F), (double) ((f14 + (float) b0) * f9 + f8), (double) ((f15 + 0.0F) * f9 + f10));
-                        tessellator.addVertexWithUV((double) (f16 + 0.0F), (double) (f4 + 0.0F), (double) (f17 + 0.0F), (double) ((f14 + 0.0F) * f9 + f8), (double) ((f15 + 0.0F) * f9 + f10));
-                    }
+					if (f3 > -5.0F)
+					{
+						worldrenderer.pos((double)(f24 + 0.0F), (double)(f3 + 0.0F), (double)(f25 + 8.0F)).tex((double)((f22 + 0.0F) * 0.00390625F + f17), (double)((f23 + 8.0F) * 0.00390625F + f18)).color(f10, f11, f12, 0.8F).normal(0.0F, -1.0F, 0.0F).endVertex();
+						worldrenderer.pos((double)(f24 + 8.0F), (double)(f3 + 0.0F), (double)(f25 + 8.0F)).tex((double)((f22 + 8.0F) * 0.00390625F + f17), (double)((f23 + 8.0F) * 0.00390625F + f18)).color(f10, f11, f12, 0.8F).normal(0.0F, -1.0F, 0.0F).endVertex();
+						worldrenderer.pos((double)(f24 + 8.0F), (double)(f3 + 0.0F), (double)(f25 + 0.0F)).tex((double)((f22 + 8.0F) * 0.00390625F + f17), (double)((f23 + 0.0F) * 0.00390625F + f18)).color(f10, f11, f12, 0.8F).normal(0.0F, -1.0F, 0.0F).endVertex();
+						worldrenderer.pos((double)(f24 + 0.0F), (double)(f3 + 0.0F), (double)(f25 + 0.0F)).tex((double)((f22 + 0.0F) * 0.00390625F + f17), (double)((f23 + 0.0F) * 0.00390625F + f18)).color(f10, f11, f12, 0.8F).normal(0.0F, -1.0F, 0.0F).endVertex();
+					}
 
-                    if (f4 <= f3 + 1.0F) {
-                        tessellator.setColorRGBA_F(f5, f6, f7, 0.8F);
-                        tessellator.setNormal(0.0F, 1.0F, 0.0F);
-                        tessellator.addVertexWithUV((double) (f16 + 0.0F), (double) (f4 + f3 - f13), (double) (f17 + (float) b0), (double) ((f14 + 0.0F) * f9 + f8), (double) ((f15 + (float) b0) * f9 + f10));
-                        tessellator.addVertexWithUV((double) (f16 + (float) b0), (double) (f4 + f3 - f13), (double) (f17 + (float) b0), (double) ((f14 + (float) b0) * f9 + f8), (double) ((f15 + (float) b0) * f9 + f10));
-                        tessellator.addVertexWithUV((double) (f16 + (float) b0), (double) (f4 + f3 - f13), (double) (f17 + 0.0F), (double) ((f14 + (float) b0) * f9 + f8), (double) ((f15 + 0.0F) * f9 + f10));
-                        tessellator.addVertexWithUV((double) (f16 + 0.0F), (double) (f4 + f3 - f13), (double) (f17 + 0.0F), (double) ((f14 + 0.0F) * f9 + f8), (double) ((f15 + 0.0F) * f9 + f10));
-                    }
+					if (f3 <= 5.0F)
+					{
+						worldrenderer.pos((double)(f24 + 0.0F), (double)(f3 + 4.0F - 9.765625E-4F), (double)(f25 + 8.0F)).tex((double)((f22 + 0.0F) * 0.00390625F + f17), (double)((f23 + 8.0F) * 0.00390625F + f18)).color(f4, f5, f6, 0.8F).normal(0.0F, 1.0F, 0.0F).endVertex();
+						worldrenderer.pos((double)(f24 + 8.0F), (double)(f3 + 4.0F - 9.765625E-4F), (double)(f25 + 8.0F)).tex((double)((f22 + 8.0F) * 0.00390625F + f17), (double)((f23 + 8.0F) * 0.00390625F + f18)).color(f4, f5, f6, 0.8F).normal(0.0F, 1.0F, 0.0F).endVertex();
+						worldrenderer.pos((double)(f24 + 8.0F), (double)(f3 + 4.0F - 9.765625E-4F), (double)(f25 + 0.0F)).tex((double)((f22 + 8.0F) * 0.00390625F + f17), (double)((f23 + 0.0F) * 0.00390625F + f18)).color(f4, f5, f6, 0.8F).normal(0.0F, 1.0F, 0.0F).endVertex();
+						worldrenderer.pos((double)(f24 + 0.0F), (double)(f3 + 4.0F - 9.765625E-4F), (double)(f25 + 0.0F)).tex((double)((f22 + 0.0F) * 0.00390625F + f17), (double)((f23 + 0.0F) * 0.00390625F + f18)).color(f4, f5, f6, 0.8F).normal(0.0F, 1.0F, 0.0F).endVertex();
+					}
 
-                    tessellator.setColorRGBA_F(f5 * 0.9F, f6 * 0.9F, f7 * 0.9F, 0.8F);
-                    int j1;
+					if (j1 > -1)
+					{
+						for (int l1 = 0; l1 < 8; ++l1)
+						{
+							worldrenderer.pos((double)(f24 + (float)l1 + 0.0F), (double)(f3 + 0.0F), (double)(f25 + 8.0F)).tex((double)((f22 + (float)l1 + 0.5F) * 0.00390625F + f17), (double)((f23 + 8.0F) * 0.00390625F + f18)).color(f26, f27, f28, 0.8F).normal(-1.0F, 0.0F, 0.0F).endVertex();
+							worldrenderer.pos((double)(f24 + (float)l1 + 0.0F), (double)(f3 + 4.0F), (double)(f25 + 8.0F)).tex((double)((f22 + (float)l1 + 0.5F) * 0.00390625F + f17), (double)((f23 + 8.0F) * 0.00390625F + f18)).color(f26, f27, f28, 0.8F).normal(-1.0F, 0.0F, 0.0F).endVertex();
+							worldrenderer.pos((double)(f24 + (float)l1 + 0.0F), (double)(f3 + 4.0F), (double)(f25 + 0.0F)).tex((double)((f22 + (float)l1 + 0.5F) * 0.00390625F + f17), (double)((f23 + 0.0F) * 0.00390625F + f18)).color(f26, f27, f28, 0.8F).normal(-1.0F, 0.0F, 0.0F).endVertex();
+							worldrenderer.pos((double)(f24 + (float)l1 + 0.0F), (double)(f3 + 0.0F), (double)(f25 + 0.0F)).tex((double)((f22 + (float)l1 + 0.5F) * 0.00390625F + f17), (double)((f23 + 0.0F) * 0.00390625F + f18)).color(f26, f27, f28, 0.8F).normal(-1.0F, 0.0F, 0.0F).endVertex();
+						}
+					}
 
-                    if (l > -1) {
-                        tessellator.setNormal(-1.0F, 0.0F, 0.0F);
+					if (j1 <= 1)
+					{
+						for (int i2 = 0; i2 < 8; ++i2)
+						{
+							worldrenderer.pos((double)(f24 + (float)i2 + 1.0F - 9.765625E-4F), (double)(f3 + 0.0F), (double)(f25 + 8.0F)).tex((double)((f22 + (float)i2 + 0.5F) * 0.00390625F + f17), (double)((f23 + 8.0F) * 0.00390625F + f18)).color(f26, f27, f28, 0.8F).normal(1.0F, 0.0F, 0.0F).endVertex();
+							worldrenderer.pos((double)(f24 + (float)i2 + 1.0F - 9.765625E-4F), (double)(f3 + 4.0F), (double)(f25 + 8.0F)).tex((double)((f22 + (float)i2 + 0.5F) * 0.00390625F + f17), (double)((f23 + 8.0F) * 0.00390625F + f18)).color(f26, f27, f28, 0.8F).normal(1.0F, 0.0F, 0.0F).endVertex();
+							worldrenderer.pos((double)(f24 + (float)i2 + 1.0F - 9.765625E-4F), (double)(f3 + 4.0F), (double)(f25 + 0.0F)).tex((double)((f22 + (float)i2 + 0.5F) * 0.00390625F + f17), (double)((f23 + 0.0F) * 0.00390625F + f18)).color(f26, f27, f28, 0.8F).normal(1.0F, 0.0F, 0.0F).endVertex();
+							worldrenderer.pos((double)(f24 + (float)i2 + 1.0F - 9.765625E-4F), (double)(f3 + 0.0F), (double)(f25 + 0.0F)).tex((double)((f22 + (float)i2 + 0.5F) * 0.00390625F + f17), (double)((f23 + 0.0F) * 0.00390625F + f18)).color(f26, f27, f28, 0.8F).normal(1.0F, 0.0F, 0.0F).endVertex();
+						}
+					}
 
-                        for (j1 = 0; j1 < b0; ++j1) {
-                            tessellator.addVertexWithUV((double) (f16 + (float) j1 + 0.0F), (double) (f4 + 0.0F), (double) (f17 + (float) b0), (double) ((f14 + (float) j1 + 0.5F) * f9 + f8), (double) ((f15 + (float) b0) * f9 + f10));
-                            tessellator.addVertexWithUV((double) (f16 + (float) j1 + 0.0F), (double) (f4 + f3), (double) (f17 + (float) b0), (double) ((f14 + (float) j1 + 0.5F) * f9 + f8), (double) ((f15 + (float) b0) * f9 + f10));
-                            tessellator.addVertexWithUV((double) (f16 + (float) j1 + 0.0F), (double) (f4 + f3), (double) (f17 + 0.0F), (double) ((f14 + (float) j1 + 0.5F) * f9 + f8), (double) ((f15 + 0.0F) * f9 + f10));
-                            tessellator.addVertexWithUV((double) (f16 + (float) j1 + 0.0F), (double) (f4 + 0.0F), (double) (f17 + 0.0F), (double) ((f14 + (float) j1 + 0.5F) * f9 + f8), (double) ((f15 + 0.0F) * f9 + f10));
-                        }
-                    }
+					if (k1 > -1)
+					{
+						for (int j2 = 0; j2 < 8; ++j2)
+						{
+							worldrenderer.pos((double)(f24 + 0.0F), (double)(f3 + 4.0F), (double)(f25 + (float)j2 + 0.0F)).tex((double)((f22 + 0.0F) * 0.00390625F + f17), (double)((f23 + (float)j2 + 0.5F) * 0.00390625F + f18)).color(f13, f14, f15, 0.8F).normal(0.0F, 0.0F, -1.0F).endVertex();
+							worldrenderer.pos((double)(f24 + 8.0F), (double)(f3 + 4.0F), (double)(f25 + (float)j2 + 0.0F)).tex((double)((f22 + 8.0F) * 0.00390625F + f17), (double)((f23 + (float)j2 + 0.5F) * 0.00390625F + f18)).color(f13, f14, f15, 0.8F).normal(0.0F, 0.0F, -1.0F).endVertex();
+							worldrenderer.pos((double)(f24 + 8.0F), (double)(f3 + 0.0F), (double)(f25 + (float)j2 + 0.0F)).tex((double)((f22 + 8.0F) * 0.00390625F + f17), (double)((f23 + (float)j2 + 0.5F) * 0.00390625F + f18)).color(f13, f14, f15, 0.8F).normal(0.0F, 0.0F, -1.0F).endVertex();
+							worldrenderer.pos((double)(f24 + 0.0F), (double)(f3 + 0.0F), (double)(f25 + (float)j2 + 0.0F)).tex((double)((f22 + 0.0F) * 0.00390625F + f17), (double)((f23 + (float)j2 + 0.5F) * 0.00390625F + f18)).color(f13, f14, f15, 0.8F).normal(0.0F, 0.0F, -1.0F).endVertex();
+						}
+					}
 
-                    if (l <= 1) {
-                        tessellator.setNormal(1.0F, 0.0F, 0.0F);
+					if (k1 <= 1)
+					{
+						for (int k2 = 0; k2 < 8; ++k2)
+						{
+							worldrenderer.pos((double)(f24 + 0.0F), (double)(f3 + 4.0F), (double)(f25 + (float)k2 + 1.0F - 9.765625E-4F)).tex((double)((f22 + 0.0F) * 0.00390625F + f17), (double)((f23 + (float)k2 + 0.5F) * 0.00390625F + f18)).color(f13, f14, f15, 0.8F).normal(0.0F, 0.0F, 1.0F).endVertex();
+							worldrenderer.pos((double)(f24 + 8.0F), (double)(f3 + 4.0F), (double)(f25 + (float)k2 + 1.0F - 9.765625E-4F)).tex((double)((f22 + 8.0F) * 0.00390625F + f17), (double)((f23 + (float)k2 + 0.5F) * 0.00390625F + f18)).color(f13, f14, f15, 0.8F).normal(0.0F, 0.0F, 1.0F).endVertex();
+							worldrenderer.pos((double)(f24 + 8.0F), (double)(f3 + 0.0F), (double)(f25 + (float)k2 + 1.0F - 9.765625E-4F)).tex((double)((f22 + 8.0F) * 0.00390625F + f17), (double)((f23 + (float)k2 + 0.5F) * 0.00390625F + f18)).color(f13, f14, f15, 0.8F).normal(0.0F, 0.0F, 1.0F).endVertex();
+							worldrenderer.pos((double)(f24 + 0.0F), (double)(f3 + 0.0F), (double)(f25 + (float)k2 + 1.0F - 9.765625E-4F)).tex((double)((f22 + 0.0F) * 0.00390625F + f17), (double)((f23 + (float)k2 + 0.5F) * 0.00390625F + f18)).color(f13, f14, f15, 0.8F).normal(0.0F, 0.0F, 1.0F).endVertex();
+						}
+					}
 
-                        for (j1 = 0; j1 < b0; ++j1) {
-                            tessellator.addVertexWithUV((double) (f16 + (float) j1 + 1.0F - f13), (double) (f4 + 0.0F), (double) (f17 + (float) b0), (double) ((f14 + (float) j1 + 0.5F) * f9 + f8), (double) ((f15 + (float) b0) * f9 + f10));
-                            tessellator.addVertexWithUV((double) (f16 + (float) j1 + 1.0F - f13), (double) (f4 + f3), (double) (f17 + (float) b0), (double) ((f14 + (float) j1 + 0.5F) * f9 + f8), (double) ((f15 + (float) b0) * f9 + f10));
-                            tessellator.addVertexWithUV((double) (f16 + (float) j1 + 1.0F - f13), (double) (f4 + f3), (double) (f17 + 0.0F), (double) ((f14 + (float) j1 + 0.5F) * f9 + f8), (double) ((f15 + 0.0F) * f9 + f10));
-                            tessellator.addVertexWithUV((double) (f16 + (float) j1 + 1.0F - f13), (double) (f4 + 0.0F), (double) (f17 + 0.0F), (double) ((f14 + (float) j1 + 0.5F) * f9 + f8), (double) ((f15 + 0.0F) * f9 + f10));
-                        }
-                    }
+					tessellator.draw();
+				}
+			}
+		}
 
-                    tessellator.setColorRGBA_F(f5 * 0.8F, f6 * 0.8F, f7 * 0.8F, 0.8F);
-
-                    if (i1 > -1) {
-                        tessellator.setNormal(0.0F, 0.0F, -1.0F);
-
-                        for (j1 = 0; j1 < b0; ++j1) {
-                            tessellator.addVertexWithUV((double) (f16 + 0.0F), (double) (f4 + f3), (double) (f17 + (float) j1 + 0.0F), (double) ((f14 + 0.0F) * f9 + f8), (double) ((f15 + (float) j1 + 0.5F) * f9 + f10));
-                            tessellator.addVertexWithUV((double) (f16 + (float) b0), (double) (f4 + f3), (double) (f17 + (float) j1 + 0.0F), (double) ((f14 + (float) b0) * f9 + f8), (double) ((f15 + (float) j1 + 0.5F) * f9 + f10));
-                            tessellator.addVertexWithUV((double) (f16 + (float) b0), (double) (f4 + 0.0F), (double) (f17 + (float) j1 + 0.0F), (double) ((f14 + (float) b0) * f9 + f8), (double) ((f15 + (float) j1 + 0.5F) * f9 + f10));
-                            tessellator.addVertexWithUV((double) (f16 + 0.0F), (double) (f4 + 0.0F), (double) (f17 + (float) j1 + 0.0F), (double) ((f14 + 0.0F) * f9 + f8), (double) ((f15 + (float) j1 + 0.5F) * f9 + f10));
-                        }
-                    }
-
-                    if (i1 <= 1) {
-                        tessellator.setNormal(0.0F, 0.0F, 1.0F);
-
-                        for (j1 = 0; j1 < b0; ++j1) {
-                            tessellator.addVertexWithUV((double) (f16 + 0.0F), (double) (f4 + f3), (double) (f17 + (float) j1 + 1.0F - f13), (double) ((f14 + 0.0F) * f9 + f8), (double) ((f15 + (float) j1 + 0.5F) * f9 + f10));
-                            tessellator.addVertexWithUV((double) (f16 + (float) b0), (double) (f4 + f3), (double) (f17 + (float) j1 + 1.0F - f13), (double) ((f14 + (float) b0) * f9 + f8), (double) ((f15 + (float) j1 + 0.5F) * f9 + f10));
-                            tessellator.addVertexWithUV((double) (f16 + (float) b0), (double) (f4 + 0.0F), (double) (f17 + (float) j1 + 1.0F - f13), (double) ((f14 + (float) b0) * f9 + f8), (double) ((f15 + (float) j1 + 0.5F) * f9 + f10));
-                            tessellator.addVertexWithUV((double) (f16 + 0.0F), (double) (f4 + 0.0F), (double) (f17 + (float) j1 + 1.0F - f13), (double) ((f14 + 0.0F) * f9 + f8), (double) ((f15 + (float) j1 + 0.5F) * f9 + f10));
-                        }
-                    }
-
-                    tessellator.draw();
-                }
-            }
-        }
-
-        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-        GL11.glDisable(GL11.GL_BLEND);
-        GL11.glEnable(GL11.GL_CULL_FACE);
+		GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+		GlStateManager.disableBlend();
+		GlStateManager.enableCull();
     }
 
 }
