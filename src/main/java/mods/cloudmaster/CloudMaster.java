@@ -1,18 +1,23 @@
 package mods.cloudmaster;
 
-import cpw.mods.fml.common.Mod;
-import cpw.mods.fml.common.Mod.Instance;
-import cpw.mods.fml.common.SidedProxy;
-import cpw.mods.fml.common.event.FMLInitializationEvent;
-import cpw.mods.fml.common.event.FMLPostInitializationEvent;
-import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import java.io.File;
+
+import org.apache.commons.lang3.math.NumberUtils;
+import gnu.trove.set.TIntSet;
+import gnu.trove.set.hash.TIntHashSet;
+
 import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.Mod.Instance;
+import net.minecraftforge.fml.common.SidedProxy;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
 @Mod(modid = CloudMaster.MOD_ID, name = CloudMaster.MOD_ID,
      version = CloudMaster.VERSION,
-     acceptedMinecraftVersions = "[1.7,1.8)",
-     dependencies = "required-after:Forge@[10.12.0.1047,);")
+     acceptedMinecraftVersions = "[1.8.8,1.9)",
+     dependencies = "required-after:Forge@[11.15.0.1609,);")
 public final class CloudMaster {
 
     public static final String MOD_ID = "CloudMaster";
@@ -22,6 +27,8 @@ public final class CloudMaster {
     @SidedProxy(clientSide = "mods.cloudmaster.ClientProxy", serverSide = "mods.cloudmaster.CommonProxy")
     public static CommonProxy proxy;
     public static int cloudheight = 128;
+
+	private static TIntSet allowedDimensions = new TIntHashSet();
 
     public static CommonProxy getProxy() {
         return proxy;
@@ -39,12 +46,27 @@ public final class CloudMaster {
         return VERSION;
     }
 
+	public static boolean isDimensionAllowed(int dimensionId) {
+		return allowedDimensions.contains(dimensionId);
+	}
+
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
         Configuration config = new Configuration(new File(event.getModConfigurationDirectory(), "cloudmaster.cfg"));
         config.load();
 
         cloudheight = config.get(Configuration.CATEGORY_GENERAL, "cloudheight", 128).getInt(128);
+
+		String dimensionString = config.get(Configuration.CATEGORY_GENERAL, "dimensions", "0", "Format: id,id,id").getString();
+		String[] dimensions = dimensionString.split(",");
+		for (String dStrO : dimensions) {
+			if (dStrO != null) {
+				String dStr = dStrO.trim();
+				if (NumberUtils.isNumber(dStr)) {
+					allowedDimensions.add(new Integer(dStr).intValue());
+				}
+			}
+		}
 
         if (config.hasChanged()) {
             config.save();
