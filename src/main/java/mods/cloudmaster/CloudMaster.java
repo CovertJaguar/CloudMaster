@@ -16,6 +16,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
 @Mod(modid = CloudMaster.MOD_ID, name = CloudMaster.MOD_ID,
      version = CloudMaster.VERSION,
+     clientSideOnly = true,
      acceptedMinecraftVersions = "[1.8.8,1.9)",
      dependencies = "required-after:Forge@[11.15.0.1609,);")
 public final class CloudMaster {
